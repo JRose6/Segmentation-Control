@@ -10,11 +10,10 @@ L.Control.SegmentationControl = L.Control.extend({
     initializeComponents: function(){   
         
         console.log(this.Marker_Group);
-
         var customcontrol = document.getElementsByClassName('leaflet-segment-trajectory-control-custom')[0];
-        customcontrol.innerHTML = "<button id='btn-open-segment-control' class='btn-open-close'><img src='2000px-Map_marker_font_awesome.png'/></button>";
+        customcontrol.innerHTML = "<button id='btn-open-segment-control' class='btn-open-close'><img src='Segmentation-Control/map_marker_font_awesome.png'/></button>";
         customcontrolcontent = L.DomUtil.create('div', 'leaflet-segment-trajectory-control-custom-container');
-        customcontrolcontent.innerHTML = "<b>Segmentation Control</b>";
+        customcontrolcontent.innerHTML = '<button id="btn-close-play-container" type="button" class="close-map-container" aria-label="Close"><span aria-hidden="true">×</span></button><br><b>Segmentation Control</b>';
         console.log(customcontrol);
         var table = document.createElement('table');
         console.log(this.labels);
@@ -41,20 +40,35 @@ L.Control.SegmentationControl = L.Control.extend({
             if(control.Bind_Markers && control.Trajectory_Layer != null){
                 var minindex=0, mindist=0;
                 var c = control.Trajectory_Layer.getLayers()[0].getLatLngs();  
-                console.log(c);
                 var latlng = e.target.getLatLng();
+                console.log(c);
+                console.log(latlng);
                 for (var i=0;i<c.length;i++){
-                    var dist = Math.abs(Math.sqrt(Math.pow(c[i].lat,2)+Math.pow(c[i].lng,2))-Math.sqrt(Math.pow(latlng.lat,2)+Math.pow(latlng.lng,2)));
+                    var dist = Math.abs(calculateDistance(c[i].lat,c[i].lng,latlng.lat,latlng.lng));
+                    console.log(dist);
                     if (dist<mindist || i==0){
                         minindex = i;
                         mindist = dist;
-                        console.log("Min Index:"+ i);
-                        console.log(mindist);
                     }
                 }
                 console.log(c[minindex]);
                 e.target.setLatLng({'lon':c[minindex].lng,'lat':c[minindex].lat});
             }
+        }
+        function calculateDistance(lat1,lng1,lat2,lng2){
+            var lat1 = toRadian(lat1);
+            var lat2 = toRadian(lat2);
+            var lng1 = toRadian(lng1);
+            var lng2 = toRadian(lng2);
+            var dlat = lat2-lat1;
+            var dlng = lng2-lng1;
+            var a = Math.pow(Math.sin(dlat/2),2)+Math.cos(lat1)*Math.cos(lat2)*Math.pow(Math.sin(dlng/2),2);
+            var c = 2 * Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+            const EARTH_RADIUS = 9793000;
+            return c * EARTH_RADIUS ;
+        }
+        function toRadian(d) {
+            return d*Math.PI/180;
         }
         function addMarker(e){
             console.log(e);
