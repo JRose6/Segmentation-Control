@@ -8,8 +8,6 @@ L.Control.SegmentationControl = L.Control.extend({
     },
 
     initializeComponents: function(){   
-        
-        console.log(this.Marker_Group);
         var customcontrol = document.getElementsByClassName('leaflet-segment-trajectory-control-custom')[0];
         customcontrol.innerHTML = "<button id='btn-open-segment-control' class='btn-open-close'><img src='Segmentation-Control/map_marker_font_awesome.png'/></button>";
         customcontrolcontent = L.DomUtil.create('div', 'leaflet-segment-trajectory-control-custom-container');
@@ -35,23 +33,36 @@ L.Control.SegmentationControl = L.Control.extend({
         customcontrolcontent.style.display = "none";
         customcontrol.appendChild(customcontrolcontent);
         var control = this;
+
+
         function bindMarker(e){
+            var color = findColor(e.target.getPopup().getContent());
+            console.log();
             if(control.Bind_Markers && control.Trajectory_Layer != null){
                 var minindex=0, mindist=0;
                 var c = control.Trajectory_Layer.getLayers()[0].getLatLngs();  
                 var latlng = e.target.getLatLng();
-                console.log(c);
-                console.log(latlng);
                 for (var i=0;i<c.length;i++){
                     var dist = Math.abs(calculateDistance(c[i].lat,c[i].lng,latlng.lat,latlng.lng));
-                    console.log(dist);
                     if (dist<mindist || i==0){
                         minindex = i;
                         mindist = dist;
                     }
                 }
                 e.target.setLatLng({'lon':c[minindex].lng,'lat':c[minindex].lat});
+                var points = getPointsAfterLastMarker(e.target.getLatLng());
+                addLine(points,e.target.getLatLng(),color);
             }
+        }
+        function findColor(label){
+            var table = document.getElementsByClassName("leaflet-segment-trajectory-control-custom-container")[0].childNodes[2];
+            for(var i=0;i<table.childNodes.length;i++){
+                if (table.childNodes[i].childNodes[1].innerHTML == label){
+                    return table.childNodes[i].childNodes[2].childNodes[0].value;
+                }
+            }
+            console.log(table);
+            
         }
         function calculateDistance(lat1,lng1,lat2,lng2){
             var lat1 = toRadian(lat1);
@@ -69,18 +80,59 @@ L.Control.SegmentationControl = L.Control.extend({
             return d*Math.PI/180;
         }
         function addMarker(e){
-            console.log(e);
             var colour = this.parentNode.parentNode.childNodes[2].childNodes[0].value;
             var label = this.parentNode.parentNode.childNodes[1].innerHTML;
-            console.log(label);
-            console.log(colour);7
             colour = colour.substr(1,colour.length);
             
            var marker = L.marker(map.getCenter(),{
                 draggable:true
             });
             control.Marker_Groups[label].addLayer(marker);
+            marker.bindPopup(label);
             marker.on('dragend',bindMarker);
+        }
+        function addLine(points, newmarkerloc,color){
+            var newline = [];
+            console.log("-----------------------");
+            console.log(newmarkerloc);
+            for(var i=0;i<points.length;i++){
+                console.log(points[i]);
+                newline.push(points[i]);
+                if (points[i].lat == newmarkerloc.lat && points[i].lng == newmarkerloc.lng){
+                    console.log(newline);
+                    break;
+                }
+            }
+                L.polyline(newline, {
+                    color: color,
+                    weight: 3,
+                    opacity: 1
+                }).addTo(map);    
+            
+                
+        }
+        function getPointsAfterLastMarker(currMarkerLoc){
+            var points = [];
+            lastElement = control.Trajectory_Layer.getLayers()[0].getLatLngs()[0];
+            for(var i=0;i<control.Trajectory_Layer.getLayers().length;i++){
+                var latlngs = control.Trajectory_Layer.getLayers()[i].getLatLngs();
+                
+                for(var j=0;j<latlngs.length;j++){
+                    points.push(latlngs[j]);
+                    if(currMarkerLoc.lat ==latlngs[j].lat && currMarkerLoc.lng ==latlngs[j].lng){
+                        return points;
+                    }
+                    control.labels.forEach(label => {
+                        var layers = control.Marker_Groups[label].getLayers();
+                        for (var i=0;i<layers.length;i++){
+                            if(layers[i].getLatLng().lat == latlngs[j].lat && layers[i].getLatLng().lng == latlngs[j].lng){
+                                points = [latlngs[j]];
+                            }
+                        }
+                    });
+                }
+            }
+            return points;
         }
         function changeColour(e){
             var label = this.parentNode.parentNode.childNodes[1].innerHTML;
@@ -90,7 +142,6 @@ L.Control.SegmentationControl = L.Control.extend({
             btn.style.background = colour;
         }
         var btnadd = document.getElementsByClassName("btn-add");   
-
         var colorpickers = document.getElementsByClassName("leaflet-custom-color");
         for(var i=0;i < colorpickers.length;i++){
             colorpickers[i].addEventListener('change',changeColour,false);
