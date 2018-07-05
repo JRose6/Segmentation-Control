@@ -141,10 +141,14 @@ L.Control.SegmentationControl = L.Control.extend({
             console.log(btn);
             btn.style.background = colour;
         }
+        function makeRandomColor() {
+            return '#' + (0x1000000 + Math.random() * 0xFFFFFF).toString(16).substr(1, 6);
+        }
         var btnadd = document.getElementsByClassName("btn-add");   
         var colorpickers = document.getElementsByClassName("leaflet-custom-color");
         for(var i=0;i < colorpickers.length;i++){
             colorpickers[i].addEventListener('change',changeColour,false);
+            colorpickers[i].value = makeRandomColor();
         }     
         for (var i = 0; i < btnadd.length; i++) {
             btnadd[i].addEventListener('click', addMarker, false);
