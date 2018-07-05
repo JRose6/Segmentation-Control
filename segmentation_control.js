@@ -13,7 +13,7 @@ L.Control.SegmentationControl = L.Control.extend({
         var customcontrol = document.getElementsByClassName('leaflet-segment-trajectory-control-custom')[0];
         customcontrol.innerHTML = "<button id='btn-open-segment-control' class='btn-open-close'><img src='Segmentation-Control/map_marker_font_awesome.png'/></button>";
         customcontrolcontent = L.DomUtil.create('div', 'leaflet-segment-trajectory-control-custom-container');
-        customcontrolcontent.innerHTML = '<button id="btn-close-play-container" type="button" class="close-map-container" aria-label="Close"><span aria-hidden="true">×</span></button><br><b>Segmentation Control</b>';
+        customcontrolcontent.innerHTML = '<button id="btn-close-play-container" type="button" class="close-map-container" aria-label="Close"><span aria-hidden="true">×</span></button><br>';
         console.log(customcontrol);
         var table = document.createElement('table');
         console.log(this.labels);
@@ -36,7 +36,6 @@ L.Control.SegmentationControl = L.Control.extend({
         customcontrol.appendChild(customcontrolcontent);
         var control = this;
         function bindMarker(e){
-            console.log("Bind event fired");
             if(control.Bind_Markers && control.Trajectory_Layer != null){
                 var minindex=0, mindist=0;
                 var c = control.Trajectory_Layer.getLayers()[0].getLatLngs();  
@@ -51,7 +50,6 @@ L.Control.SegmentationControl = L.Control.extend({
                         mindist = dist;
                     }
                 }
-                console.log(c[minindex]);
                 e.target.setLatLng({'lon':c[minindex].lng,'lat':c[minindex].lat});
             }
         }
@@ -65,7 +63,7 @@ L.Control.SegmentationControl = L.Control.extend({
             var a = Math.pow(Math.sin(dlat/2),2)+Math.cos(lat1)*Math.cos(lat2)*Math.pow(Math.sin(dlng/2),2);
             var c = 2 * Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
             const EARTH_RADIUS = 9793000;
-            return c * EARTH_RADIUS ;
+            return c * EARTH_RADIUS;
         }
         function toRadian(d) {
             return d*Math.PI/180;
@@ -86,14 +84,13 @@ L.Control.SegmentationControl = L.Control.extend({
         }
         function changeColour(e){
             var label = this.parentNode.parentNode.childNodes[1].innerHTML;
+            var btn = this.parentNode.parentNode.childNodes[0].childNodes[0];
             var colour = this.value;
-            var label = this.parentNode.parentNode.childNodes[1].innerHTML;
-            console.log(control.Marker_Groups[label]);
-            control.Marker_Groups[label].getLayers().forEach(marker => {
-                marker.setIcon(icon);    
-            });
+            console.log(btn);
+            btn.style.background = colour;
         }
         var btnadd = document.getElementsByClassName("btn-add");   
+
         var colorpickers = document.getElementsByClassName("leaflet-custom-color");
         for(var i=0;i < colorpickers.length;i++){
             colorpickers[i].addEventListener('change',changeColour,false);
@@ -103,7 +100,8 @@ L.Control.SegmentationControl = L.Control.extend({
         }
         var btnopen = document.getElementById("btn-open-segment-control");
         btnopen.addEventListener('click',this.show,false);
-
+        var btnclose = document.getElementById("btn-close-play-container");
+        btnclose.addEventListener('click',this.hide,false);
     },
     show: function(){
         var container = document.getElementsByClassName("leaflet-segment-trajectory-control-custom-container")[0];

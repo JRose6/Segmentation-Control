@@ -5,10 +5,26 @@
 .leaflet-segment-trajectory-control-custom > table > tr > td{
     padding:2px;
 }
+.leaflet-segment-trajectory-control-custom table button{
+    border-radius: 50%;
+    border:1px solid black;
+    background-color: white;
+}
 .btn-open-close{
     background-color: white;
     color:none;
     border:none;
     padding-left:2px;
     padding-right:2px;
+}
+#btn-close-play-container{
+    background-color: white;
+    border:none;
+    float:right;
+    padding-right:2px;
+    padding-left:2px;
+}
+.leaflet-custom-color{
+    background-color: white;
+    border:none;
 }
