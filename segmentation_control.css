@@ -1,0 +1,14 @@
+.leaflet-segment-trajectory-control-custom{
+    background-color: white;
+    padding:5px;
+}
+.leaflet-segment-trajectory-control-custom > table > tr > td{
+    padding:2px;
+}
+.btn-open-close{
+    background-color: white;
+    color:none;
+    border:none;
+    padding-left:2px;
+    padding-right:2px;
+}
