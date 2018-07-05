@@ -4,5 +4,5 @@ Leaflet.js custom control for trajectory segmentation.
 <ul>
 <li>As points that have been set are changed, fix the coloured segmentation</li>
 <li>Investigate customized colours for markers</li>
-<li>More to be added.....</li>
+<li>More to be added........</li>
 </ul>
