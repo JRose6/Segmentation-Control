@@ -67,14 +67,7 @@ L.Control.SegmentationControl = L.Control.extend({
                     }
                 }
                 e.target.setLatLng({'lon':c[minindex].lng,'lat':c[minindex].lat});
-                control.labels.forEach(label =>{
-                    control.Marker_Groups[label].getLayers().forEach(marker =>{
-                        color = findColor(marker.getPopup().getContent())
-                        var points = getPointsAfterLastMarker(marker.getLatLng());
-                        addLine(points,marker.getLatLng(),color,marker.getPopup().getContent());    
-                    
-                    });
-                })
+                generateSegmentation();
             }
         }
        
@@ -96,6 +89,8 @@ L.Control.SegmentationControl = L.Control.extend({
             var colour = this.value;
             console.log(btn);
             btn.style.background = colour;
+            clearSegmentation();
+            generateSegmentation();
         }
         function findColor(label){
             var table = document.getElementsByClassName("leaflet-segment-trajectory-control-custom-container")[0].childNodes[2];
@@ -122,7 +117,16 @@ L.Control.SegmentationControl = L.Control.extend({
         function toRadian(d) {
             return d*Math.PI/180;
         }
-        
+        function generateSegmentation(){
+            control.labels.forEach(label =>{
+                control.Marker_Groups[label].getLayers().forEach(marker =>{
+                    color = findColor(marker.getPopup().getContent())
+                    var points = getPointsAfterLastMarker(marker.getLatLng());
+                    addLine(points,marker.getLatLng(),color,marker.getPopup().getContent());    
+                
+                });
+            });
+        }
         function addLine(points, newmarkerloc,color,label){
             var newline = [];
             console.log("-----------------------");
