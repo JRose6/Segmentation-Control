@@ -28,16 +28,33 @@ L.Control.SegmentationControl = L.Control.extend({
             tr.appendChild(colorpickertd);
             table.appendChild(tr);
             this.Marker_Groups[label] = L.layerGroup().addTo(map);
+            this.Segmentation_Groups[label] = L.layerGroup().addTo(map);
         });
         customcontrolcontent.appendChild(table);
         customcontrolcontent.style.display = "none";
         customcontrol.appendChild(customcontrolcontent);
         var control = this;
+        
+        var btnadd = document.getElementsByClassName("btn-add");   
+        var colorpickers = document.getElementsByClassName("leaflet-custom-color");
+        for(var i=0;i < colorpickers.length;i++){
+            colorpickers[i].addEventListener('change',changeColour,false);
+            colorpickers[i].value = makeRandomColor();
+            colorpickers[i].dispatchEvent(new Event("change"));
+        }
 
+        for (var i = 0; i < btnadd.length; i++) {
+            btnadd[i].addEventListener('click', addMarker, false);
+        }
+
+        var btnopen = document.getElementById("btn-open-segment-control");
+        btnopen.addEventListener('click',this.show,false);
+        var btnclose = document.getElementById("btn-close-play-container");
+        btnclose.addEventListener('click',this.hide,false);
 
         function bindMarker(e){
+            clearSegmentation();
             var color = findColor(e.target.getPopup().getContent());
-            console.log();
             if(control.Bind_Markers && control.Trajectory_Layer != null){
                 var minindex=0, mindist=0;
                 var c = control.Trajectory_Layer.getLayers()[0].getLatLngs();  
@@ -50,9 +67,35 @@ L.Control.SegmentationControl = L.Control.extend({
                     }
                 }
                 e.target.setLatLng({'lon':c[minindex].lng,'lat':c[minindex].lat});
-                var points = getPointsAfterLastMarker(e.target.getLatLng());
-                addLine(points,e.target.getLatLng(),color);
+                control.labels.forEach(label =>{
+                    control.Marker_Groups[label].getLayers().forEach(marker =>{
+                        color = findColor(marker.getPopup().getContent())
+                        var points = getPointsAfterLastMarker(marker.getLatLng());
+                        addLine(points,marker.getLatLng(),color,marker.getPopup().getContent());    
+                    
+                    });
+                })
             }
+        }
+       
+        function addMarker(e){
+            var colour = this.parentNode.parentNode.childNodes[2].childNodes[0].value;
+            var label = this.parentNode.parentNode.childNodes[1].innerHTML;
+            colour = colour.substr(1,colour.length);
+            
+           var marker = L.marker(map.getCenter(),{
+                draggable:true
+            });
+            control.Marker_Groups[label].addLayer(marker);
+            marker.bindPopup(label);
+            marker.on('dragend',bindMarker);
+        }
+        function changeColour(e){
+            var label = this.parentNode.parentNode.childNodes[1].innerHTML;
+            var btn = this.parentNode.parentNode.childNodes[0].childNodes[0];
+            var colour = this.value;
+            console.log(btn);
+            btn.style.background = colour;
         }
         function findColor(label){
             var table = document.getElementsByClassName("leaflet-segment-trajectory-control-custom-container")[0].childNodes[2];
@@ -79,19 +122,8 @@ L.Control.SegmentationControl = L.Control.extend({
         function toRadian(d) {
             return d*Math.PI/180;
         }
-        function addMarker(e){
-            var colour = this.parentNode.parentNode.childNodes[2].childNodes[0].value;
-            var label = this.parentNode.parentNode.childNodes[1].innerHTML;
-            colour = colour.substr(1,colour.length);
-            
-           var marker = L.marker(map.getCenter(),{
-                draggable:true
-            });
-            control.Marker_Groups[label].addLayer(marker);
-            marker.bindPopup(label);
-            marker.on('dragend',bindMarker);
-        }
-        function addLine(points, newmarkerloc,color){
+        
+        function addLine(points, newmarkerloc,color,label){
             var newline = [];
             console.log("-----------------------");
             console.log(newmarkerloc);
@@ -103,11 +135,11 @@ L.Control.SegmentationControl = L.Control.extend({
                     break;
                 }
             }
-                L.polyline(newline, {
+            control.Segmentation_Groups[label].addLayer(L.polyline(newline, {
                     color: color,
                     weight: 3,
                     opacity: 1
-                }).addTo(map);    
+                }));    
             
                 
         }
@@ -134,29 +166,14 @@ L.Control.SegmentationControl = L.Control.extend({
             }
             return points;
         }
-        function changeColour(e){
-            var label = this.parentNode.parentNode.childNodes[1].innerHTML;
-            var btn = this.parentNode.parentNode.childNodes[0].childNodes[0];
-            var colour = this.value;
-            console.log(btn);
-            btn.style.background = colour;
-        }
         function makeRandomColor() {
             return '#' + (0x1000000 + Math.random() * 0xFFFFFF).toString(16).substr(1, 6);
         }
-        var btnadd = document.getElementsByClassName("btn-add");   
-        var colorpickers = document.getElementsByClassName("leaflet-custom-color");
-        for(var i=0;i < colorpickers.length;i++){
-            colorpickers[i].addEventListener('change',changeColour,false);
-            colorpickers[i].value = makeRandomColor();
-        }     
-        for (var i = 0; i < btnadd.length; i++) {
-            btnadd[i].addEventListener('click', addMarker, false);
+        function clearSegmentation(){
+            control.labels.forEach(element =>{
+                control.Segmentation_Groups[element].clearLayers();
+            });
         }
-        var btnopen = document.getElementById("btn-open-segment-control");
-        btnopen.addEventListener('click',this.show,false);
-        var btnclose = document.getElementById("btn-close-play-container");
-        btnclose.addEventListener('click',this.hide,false);
     },
     show: function(){
         var container = document.getElementsByClassName("leaflet-segment-trajectory-control-custom-container")[0];
@@ -173,7 +190,8 @@ L.Control.SegmentationControl = L.Control.extend({
     labels: [],
     Marker_Groups:{},
     Bind_Markers:true,
-    Trajectory_Layer:null
+    Trajectory_Layer:null,
+    Segmentation_Groups:{}
 });
 
 L.control.SegmentationControl = function(options) {
