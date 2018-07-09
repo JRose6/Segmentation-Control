@@ -1,4 +1,4 @@
-.leaflet-segment-trajectory-control-custom{
+.leaflet-segment-trajectory-control-custom-container{
     background-color: white;
     padding:5px;
 }
@@ -10,13 +10,7 @@
     border:1px solid black;
     background-color: white;
 }
-.btn-open-close{
-    background-color: white;
-    color:none;
-    border:none;
-    padding-left:2px;
-    padding-right:2px;
-}
+
 #btn-close-play-container{
     background-color: white;
     border:none;
@@ -27,4 +21,12 @@
 .leaflet-custom-color{
     background-color: white;
     border:none;
+}
+.leaflet-control-button-custom {
+    background-color: white;
+    height: 28px;
+    width: 33px;
+    border-radius: 4px;
+    padding:0;
+    margin:0;
 }

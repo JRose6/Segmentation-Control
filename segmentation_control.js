@@ -9,7 +9,7 @@ L.Control.SegmentationControl = L.Control.extend({
 
     initializeComponents: function(){   
         var customcontrol = document.getElementsByClassName('leaflet-segment-trajectory-control-custom')[0];
-        customcontrol.innerHTML = "<button id='btn-open-segment-control' class='btn-open-close'><img src='Segmentation-Control/map_marker_font_awesome.png'/></button>";
+        customcontrol.innerHTML = "<button id='btn-open-segment-control' class='btn-open-close leaflet-control-button-custom'><img src='Segmentation-Control/map_marker_font_awesome.png'/></button>";
         customcontrolcontent = L.DomUtil.create('div', 'leaflet-segment-trajectory-control-custom-container');
         customcontrolcontent.innerHTML = '<button id="btn-close-play-container" type="button" class="close-map-container" aria-label="Close"><span aria-hidden="true">×</span></button><br>';
         console.log(customcontrol);
