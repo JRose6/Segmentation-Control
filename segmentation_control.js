@@ -12,9 +12,8 @@ L.Control.SegmentationControl = L.Control.extend({
         customcontrol.innerHTML = "<button id='btn-open-segment-control' class='btn-open-close leaflet-control-button-custom'><img src='Segmentation-Control/map_marker_font_awesome.png'/></button>";
         customcontrolcontent = L.DomUtil.create('div', 'leaflet-segment-trajectory-control-custom-container');
         customcontrolcontent.innerHTML = '<button id="btn-close-play-container" type="button" class="close-map-container" aria-label="Close"><span aria-hidden="true">×</span></button><br>';
-        console.log(customcontrol);
+        
         var table = document.createElement('table');
-        console.log(this.labels);
         this.labels.forEach(label => {   
             var tr = document.createElement('tr');
             var addtd = document.createElement('td');
@@ -87,7 +86,6 @@ L.Control.SegmentationControl = L.Control.extend({
             var label = this.parentNode.parentNode.childNodes[1].innerHTML;
             var btn = this.parentNode.parentNode.childNodes[0].childNodes[0];
             var colour = this.value;
-            console.log(btn);
             btn.style.background = colour;
             clearSegmentation();
             generateSegmentation();
@@ -99,7 +97,6 @@ L.Control.SegmentationControl = L.Control.extend({
                     return table.childNodes[i].childNodes[2].childNodes[0].value;
                 }
             }
-            console.log(table);
             
         }
         function calculateDistance(lat1,lng1,lat2,lng2){
@@ -129,13 +126,9 @@ L.Control.SegmentationControl = L.Control.extend({
         }
         function addLine(points, newmarkerloc,color,label){
             var newline = [];
-            console.log("-----------------------");
-            console.log(newmarkerloc);
             for(var i=0;i<points.length;i++){
-                console.log(points[i]);
                 newline.push(points[i]);
                 if (points[i].lat == newmarkerloc.lat && points[i].lng == newmarkerloc.lng){
-                    console.log(newline);
                     break;
                 }
             }
